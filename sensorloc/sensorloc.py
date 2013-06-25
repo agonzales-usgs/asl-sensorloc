@@ -90,7 +90,7 @@ class SensorLoc(object):
         @param filename: Desired output PNG file name.
         @param endtime: UTCDateTime object indicating the desired end time of the new Stream.
         """
-        f = sl.DataStream.plot()
+        f = self.DataStream.plot()
         mpl.savefig('output.png')
         
     def save(self,filename):
