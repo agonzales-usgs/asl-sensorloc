@@ -25,10 +25,6 @@ def main(options, parser):
     # when verbose, list loaded streams
     if options.verbose:
         print streams
-    # output range
-    if options.range:
-        print 'Start: %s\nEnd: %s\n' % (extent['start'], extent['end'])
-        sys.exit(0)
     # filter traces
     streams.simulate(
             responses=sensorloc.Responses(options.responseDirectory),
