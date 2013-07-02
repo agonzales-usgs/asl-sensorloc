@@ -115,11 +115,24 @@ class Streams (object):
 	def plot(self):
 		self.data.plot()
 
-	def write(self, outputdir, format='MSEED', encoding=None, reclen=None):
+	def write(self, outputdir, format='MSEED', encoding=None, reclen=None, suffix=''):
+		"""
+		Write traces in stream to separate files in a directory.
+
+		Filenames are determined by the method getTraceFilename.
+
+		@param outputdir {String} the directory where files are written.
+		@param format {String} Default MSEED.
+		@param encoding {String} Default None (automatic).
+		@param reclen {int} Default None (automatic).
+		@param suffix {String} suffix to append to normal filename.
+		"""
 		extent = self.getTimeExtent(True)
+		# suffix depends on operations performed
 		for trace in self.data:
 			trace.write(
-				filename=os.path.join(outputdir, self.getTraceFilename(trace, 'mseed')),
+				filename=os.path.join(outputdir,
+						self.getTraceFilename(trace, 'mseed') + suffix),
 				format=format,
 				encoding=encoding or trace.stats.encoding,
 				reclen=reclen)
