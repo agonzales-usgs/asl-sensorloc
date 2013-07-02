@@ -26,6 +26,8 @@ def main(options, parser):
     if options.verbose:
         print streams
     # filter traces
+    if options.verbose:
+        print 'removing instrument response'
     streams.simulate(
             responses=sensorloc.Responses(options.responseDirectory),
             response_units=options.responseUnits,
@@ -34,11 +36,15 @@ def main(options, parser):
     # trim traces after filtering
     try:
         if options.startTime is not None or options.endTime is not None:
+            if options.verbose:
+                print 'trimming'
             streams.trim(starttime=options.startTime, endtime=options.endTime)
     except Exception,msg:
         print 'Error trimming: "%s"' % msg
     # run bandpass filter
     if options.filter:
+        if options.verbose:
+            print 'running bandpass filter'
         streams.filter('bandpass',
                 freqmin=options.freqmin,
                 freqmax=options.freqmax,
@@ -47,6 +53,8 @@ def main(options, parser):
     if not os.path.isdir(options.outputDirectory):
         os.makedirs(options.outputDirectory)
     try:
+        if options.verbose:
+            print 'writing output to ' + options.outputDirectory
         suffix = ''
         if options.simulate:
             suffix += '.d'
