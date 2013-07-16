@@ -7,6 +7,6 @@ setup(name='SensorLoc',
       description='Seismic sensor timeseries manipulation tools',
       author='Mike Hearne, Jeremy Fee',
       author_email='mhearne@usgs.gov, jmfee@usgs.gov',
-      url='http://github.com/mhearne-usgs/sensorloc',
+      url='https://github.com/usgs/asl-sensorloc',
       packages=['sensorloc'],
      )
