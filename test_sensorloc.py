@@ -32,8 +32,7 @@ def test_trim():
     assert myrange['start'] == seedstart
     assert myrange['end'] == seedend
 
-def test():
-    pass
+
 
 
     

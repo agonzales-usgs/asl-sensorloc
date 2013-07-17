@@ -45,9 +45,9 @@ def main(arguments,parser):
         else:
             outfolder = arguments.outFolder
         if arguments.startTime is not None:
-            clipstart = utcdatetime.UTCDateTime(arguments.startTime,iso8601=True)
+            clipstart = arguments.startTime
         if arguments.endTime is not None:
-            clipend = utcdatetime.UTCDateTime(arguments.endTime,iso8601=True)
+            clipend = arguments.endTime
 
         sl.trim(starttime=clipstart,endtime=clipend)
         if not os.path.isdir(outfolder):
@@ -76,11 +76,14 @@ def main(arguments,parser):
 #in the main() function ensures that main() variables stay in their expected scope.
 if __name__ == '__main__':
     usage = """Chop a Mini-SEED file by two bounding times, and save each trace in a separate file.
+    If start/end times are NOT set, the output files will be chopped to the common extent of all of the
+    obspy streams input. 
     Optionally the user can:
      - plot the chopped traces
      - specify the output directory where chopped traces and plots are written.
      - get the range of the input data file
      - chop the input data interactively (NOT YET IMPLEMENTED)
+     
     """
     cmdparser = argparse.ArgumentParser(usage=usage)
     cmdparser.add_argument('miniseed', metavar='SEED', nargs='+',
@@ -88,9 +91,9 @@ if __name__ == '__main__':
     cmdparser.add_argument("-o", "--outputDirectory", dest="outFolder",nargs='?',
                            help="""Select output directory where chopped time series files will be written 
     (defaults to current working directory)""", metavar="OUTPUTFOLDER")
-    cmdparser.add_argument("-s", "--start", dest="startTime",
+    cmdparser.add_argument("-s", "--start", dest="startTime", type=utcdatetime.UTCDateTime,
                            help="Select left edge of time series window (YYYY-MM-DDTHH:MM:SS.sss'", metavar="STARTTIME")
-    cmdparser.add_argument("-e", "--end", dest="endTime",
+    cmdparser.add_argument("-e", "--end", dest="endTime", type=utcdatetime.UTCDateTime,
                            help="Select left edge of time series window (YYYY-MM-DDTHH:MM:SS.sss'", metavar="ENDTIME")
     cmdparser.add_argument("-p", "--plot",
                            action="store_true", dest="makePlot", default=False,
