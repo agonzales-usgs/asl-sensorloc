@@ -44,10 +44,9 @@ def main(arguments,parser):
             outfolder = os.getcwd()
         else:
             outfolder = arguments.outFolder
-        if arguments.startTime is not None:
-            clipstart = arguments.startTime
-        if arguments.endTime is not None:
-            clipend = arguments.endTime
+            
+        clipstart = arguments.startTime
+        clipend = arguments.endTime
 
         sl.trim(starttime=clipstart,endtime=clipend)
         if not os.path.isdir(outfolder):
@@ -91,10 +90,10 @@ if __name__ == '__main__':
     cmdparser.add_argument("-o", "--outputDirectory", dest="outFolder",nargs='?',
                            help="""Select output directory where chopped time series files will be written 
     (defaults to current working directory)""", metavar="OUTPUTFOLDER")
-    cmdparser.add_argument("-s", "--start", dest="startTime", type=utcdatetime.UTCDateTime,
-                           help="Select left edge of time series window (YYYY-MM-DDTHH:MM:SS.sss'", metavar="STARTTIME")
-    cmdparser.add_argument("-e", "--end", dest="endTime", type=utcdatetime.UTCDateTime,
-                           help="Select left edge of time series window (YYYY-MM-DDTHH:MM:SS.sss'", metavar="ENDTIME")
+    cmdparser.add_argument("-s", "--start", dest="startTime", type=utcdatetime.UTCDateTime, default=None,
+                           help="Select left edge of time series window (YYYY-MM-DDTHH:MM:SS.sss)'", metavar="STARTTIME")
+    cmdparser.add_argument("-e", "--end", dest="endTime", type=utcdatetime.UTCDateTime, default=None,
+                           help="Select left edge of time series window (YYYY-MM-DDTHH:MM:SS.sss)'", metavar="ENDTIME")
     cmdparser.add_argument("-p", "--plot",
                            action="store_true", dest="makePlot", default=False,
                            help="Save a plot (JPG format) of the chopped data.")
