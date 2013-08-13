@@ -41,14 +41,28 @@ def main(options, parser):
             streams.trim(starttime=options.startTime, endtime=options.endTime)
     except Exception,msg:
         print 'Error trimming: "%s"' % msg
-    # run bandpass filter
-    if options.filter:
+    # run whichever filters are chosen
+    if options.bandpass:
         if options.verbose:
             print 'running bandpass filter'
         streams.filter('bandpass',
-                freqmin=options.freqmin,
-                freqmax=options.freqmax,
-                corners=options.corners)
+                freqmin=options.bandpass[0],
+                freqmax=options.bandpass[1],
+                corners=options.bandpass[2])
+    if options.lowpass:
+        if options.verbose:
+            print 'running bandpass filter'
+        streams.filter('lowpass',
+                freq=options.lowpass[0],
+                df=options.lowpass[1],
+                corners=options.lowpass[2])
+    if options.highpass:
+        if options.verbose:
+            print 'running highpass filter'
+        streams.filter('highpass',
+                freq=options.highpass[0],
+                df=options.highpass[1],
+                corners=options.highpass[2])
     # write output
     if not os.path.isdir(options.outputDirectory):
         os.makedirs(options.outputDirectory)
@@ -79,30 +93,29 @@ if __name__ == '__main__':
     parser.add_argument('-v', '--verbose', dest='verbose', action='store_true')
     parser.add_argument('-p', '--plot', default=False, action='store_true',
             help='Save a plot (PNG format) of the filtered data.')
+    parser.add_argument('-bp', dest='bandpass', nargs=3, metavar=('MIN','MAX','NPOLES'),
+            help='Bandpass filter (after) removing instrument response')
+    parser.add_argument('-lp', dest='lowpass', nargs=3, metavar=('FREQ','DF','NPOLES'),
+            help='Lowpass filter (after) removing instrument response')
+    parser.add_argument('-hp', dest='highpass', nargs=3, metavar=('FREQ','DF','NPOLES'),
+            help='Highpass filter (after) removing instrument response')
     parser.add_argument('--outputDirectory', default='.',
             help='Output directory for processed Mini-SEED files')
     parser.add_argument('--simulate', default=False, action='store_true',
             help='Remove instrument response using RESP files')
-    parser.add_argument('--prefilt', default=None, nargs=4, type=float,
+    parser.add_argument('--prefilt', nargs=4, default=None, type=float, 
+            metavar=('corner1','corner2','corner3','corner4'),
             help='Bandpass filter to apply before simulate, 4 corner frequencies')
     parser.add_argument('--responseDirectory', default='.',
             help='Directory with response files for traces in input Mini-SEEDs')
     parser.add_argument('--responseUnits', default='ACC',
             help='Units for simulate call')
-    parser.add_argument('--taper', default=False, action='store_true')
-    parser.add_argument('--filter', default=False, action='store_true',
-            help='Bandpass filter (after) removing instrument response')
-    parser.add_argument('--freqmin', type=float, default=None,
-            help='Minimum frequency for bandpass filter')
-    parser.add_argument('--freqmax', type=float, default=None,
-            help='Maximum frequency for bandpass filter')
-    parser.add_argument('--corners', type=int, default=4,
-            help='Number of corners for bandpass filter')
+    parser.add_argument('--no-taper', default=True, action='store_false')
     parser.add_argument('-s', '--start', dest='startTime', metavar='STARTTIME',
-            help='Trim time series (YYYY-MM-DDTHH:MM:SS.sss) after simulate and filter',
+            help='Trim time series (YYYY,DDD,HH:MM:SS) after simulate and filter',
             type=UTCDateTime)
     parser.add_argument('-e', '--end', dest='endTime', metavar='ENDTIME',
-            help='Trim time series (YYYY-MM-DDTHH:MM:SS.sss) after simulate and filter',
+            help='Trim time series (YYYY,DDD,HH:MM:SS) after simulate and filter',
             type=UTCDateTime)
 
     main(parser.parse_args(),parser)
