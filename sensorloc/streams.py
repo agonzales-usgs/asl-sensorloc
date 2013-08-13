@@ -5,7 +5,27 @@ from obspy.iris import Client
 import time
 import os.path
 
+import math
+import matplotlib.mlab as mlab
+import scipy.optimize.minpack as solv
+
 from responses import Responses
+
+
+def normalize360(theta):
+	"""
+	Utility method to normalize an angle to between 0 and 360.
+
+	@param theta angle in degrees
+	@return angle in degrees, normalized to between 0 and 360.
+	"""
+	return theta
+	while theta < 0:
+		theta += 360
+	while theta >= 360:
+		theta -= 360
+	return theta
+
 
 class StreamsException (Exception):
 	"""exception used when errors occur in Streams object."""
@@ -191,6 +211,79 @@ class Streams (object):
 		"""
 		for trace in self.data:
 			trace.filter(type, **kwargs)
+
+	def coherence(self, referenceStream, referenceAzimuth, NFFT=None, noverlap=None, Fs=None):
+		"""
+		Determine angle of a north and east channel based on a reference north channel.
+
+		@param referenceStream stream containing a reference North channel.
+		@param referenceAzimuth reference angle of North channel.
+		@param NFFT number of points to use in FFT.
+		@param noverlap number of overlapping points between FFTs.
+		@param Fs sampling frequency. If omitted, uses referenceStream sampling_rate.
+		@return relative angle from unknown north to reference north
+				(referenceAngle-angle = actual angle of unknown channel).
+		"""
+		referenceExtent = referenceStream.getTimeExtent()
+		unknownExtent = self.getTimeExtent()
+		if referenceExtent['start'] != unknownExtent['start'] or referenceExtent['end'] != unknownExtent['end']:
+			raise StreamsException("reference and unknown streams must have same time extent")
+		if Fs is None:
+			Fs = referenceStream.data.traces[0].stats.sampling_rate
+		if noverlap is None:
+			noverlap = NFFT / 4
+		# internal function to determine the coherence of unrotated and rotated data
+		def cohere1(theta):
+			theta_r = math.radians(theta);
+			rotated = (self.data[0].data)*math.cos(theta_r) + (self.data[1].data)*math.sin(theta_r)
+			coh,fre = mlab.cohere(referenceStream.data[0].data, rotated,
+					NFFT=NFFT, noverlap=noverlap, Fs=Fs)
+			return (coh - 1).sum()
+		# most coherent angle of rotation
+		theta1 = solv.leastsq(cohere1, 0)
+		theta1 = normalize360(theta1[0][0])
+
+		# rotate data and compare against reference stream
+		rotated = self.rotate(theta1)
+		rotatedData1 = rotated.data[0].data.astype('Float64')
+		referenceData1 = referenceStream.data[0].data.astype('Float64')
+		scale1 = sum(abs(rotatedData1)) / sum(abs(referenceData1))
+		residual1 = sum(referenceData1**2-rotatedData1*scale1)**2
+		rotatedData2 = rotated.data[1].data.astype('Float64')
+		referenceData2 = referenceStream.data[1].data.astype('Float64')
+		scale2 = sum(abs(rotatedData2)) / sum(abs(referenceData2))
+		residual2 = sum(referenceData2**2-rotatedData2*scale2)**2
+
+		return {
+			'theta': theta1,
+			'azimuth': referenceAzimuth - theta1,
+			'rotated': rotated,
+			'scale1': scale1,
+			'residual1': residual1,
+			'scale2': scale2,
+			'residual2': residual2
+		}
+
+	def rotate(self, angle):
+		"""
+		Rotate 2 channels by a specified angle.
+
+		@param angle the angle to rotate in degrees
+		@return new streams object with rotated channels.
+		"""
+		theta_r = math.radians(angle)
+		# create new trace objects with same info as previous
+		rotatedN = self.data[0].copy()
+		rotatedE = self.data[1].copy()
+		# assign rotated data
+		rotatedN.data = self.data[0].data*math.cos(theta_r) + self.data[1].data*math.sin(theta_r)
+		rotatedE.data = self.data[1].data*math.cos(theta_r) - self.data[0].data*math.sin(theta_r)
+		# return new streams object with rotated traces
+		streams = Streams()
+		streams.addStream(rotatedN)
+		streams.addStream(rotatedE)
+		return streams
+
 
 	def __str__(self):
 		"""
