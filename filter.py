@@ -63,7 +63,7 @@ def main(options, parser):
         streams.write(options.outputDirectory, encoding='FLOAT64', suffix=suffix)
     except Exception,msg:
         print 'Error writing output: "%s"' % msg
-    # generate plot
+    # generate plot - test
     if options.plot:
         streams.plot()
 
@@ -78,7 +78,7 @@ if __name__ == '__main__':
             help='Mini-SEED files to process')
     parser.add_argument('-v', '--verbose', dest='verbose', action='store_true')
     parser.add_argument('-p', '--plot', default=False, action='store_true',
-            help='Save a plot (PNG format) of the chopped data.')
+            help='Save a plot (PNG format) of the filtered data.')
     parser.add_argument('--outputDirectory', default='.',
             help='Output directory for processed Mini-SEED files')
     parser.add_argument('--simulate', default=False, action='store_true',

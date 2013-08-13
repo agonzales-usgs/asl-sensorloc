@@ -1,6 +1,7 @@
 #third party imports
 from obspy import core, UTCDateTime
 from obspy.iris import Client
+import matplotlib.pyplot as mpl
 #stdlib imports
 import time
 import os.path
@@ -132,8 +133,11 @@ class Streams (object):
             raise StreamsException("\n".join(errors));
         self.data.trim(starttime, endtime)
 
-    def plot(self):
-        self.data.plot()
+    def plot(self,filename=None):
+        if filename is not None:
+            self.data.plot(outfile=filename)
+        else:
+            self.data.plot()
 
     def write(self, outputdir, format='MSEED', encoding=None, reclen=None, suffix=''):
         """
