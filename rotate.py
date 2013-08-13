@@ -41,7 +41,7 @@ def main(options, parser):
 
 # when script is run instead of imported
 if __name__ == '__main__':
-    parser = argparse.ArgumentParser(description='Determine angle between a reference station and a unknown station.')
+    parser = argparse.ArgumentParser(description='Rotate two components clockwise by a specified angle.')
 
     parser.add_argument('miniseeds', metavar='SEED', nargs=2,
             help='Mini-SEED files to process')
