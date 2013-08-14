@@ -51,7 +51,7 @@ def main(options, parser):
                 corners=options.bandpass[2])
     if options.lowpass:
         if options.verbose:
-            print 'running bandpass filter'
+            print 'running lowpass filter'
         streams.filter('lowpass',
                 freq=options.lowpass[0],
                 corners=options.lowpass[1])
