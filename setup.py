@@ -9,4 +9,5 @@ setup(name='SensorLoc',
       author_email='mhearne@usgs.gov, jmfee@usgs.gov',
       url='https://github.com/usgs/asl-sensorloc',
       packages=['sensorloc'],
+      scripts = ['filter.py','chop.py','rotate.py','coherence.py'],
      )

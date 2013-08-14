@@ -195,6 +195,26 @@ class Streams (object):
                 kwargs["seedresp"] = None
             trace.simulate(**kwargs)
 
+    def lowpassFilter(self,freq, sampleRate, corners=4):
+        """
+        Use a lowpass filter with specified parameters
+
+        @param freq filter corner frequency
+        @param sampleRate sampling rate in Hz
+        @keyword corners number of corners
+        """
+        self.filter('lowpass', freq, sampleRate, corners=corners)
+
+    def highpassFilter(self,freq, sampleRate, corners=4):
+        """
+        Use a highpass filter with specified parameters
+
+        @param freq filter corner frequency
+        @param sampleRate sampling rate in Hz
+        @keyword corners number of corners
+        """
+        self.filter('highpass', freq, sampleRate, corners=corners)
+            
     def bandpassFilter(self, freqmin=.1, freqmax=15, corners=2):
         """
         Use a bandpass filter with specified parameters
