@@ -32,7 +32,7 @@ def main(options, parser):
             responses=sensorloc.Responses(options.responseDirectory),
             response_units=options.responseUnits,
             pre_filt=options.prefilt,
-            taper=options.taper)
+            taper=not options.no_taper)
     # trim traces after filtering
     try:
         if options.startTime is not None or options.endTime is not None:
@@ -54,15 +54,13 @@ def main(options, parser):
             print 'running bandpass filter'
         streams.filter('lowpass',
                 freq=options.lowpass[0],
-                df=options.lowpass[1],
-                corners=options.lowpass[2])
+                corners=options.lowpass[1])
     if options.highpass:
         if options.verbose:
             print 'running highpass filter'
         streams.filter('highpass',
                 freq=options.highpass[0],
-                df=options.highpass[1],
-                corners=options.highpass[2])
+                corners=options.highpass[1])
     # write output
     if not os.path.isdir(options.outputDirectory):
         os.makedirs(options.outputDirectory)
@@ -72,7 +70,7 @@ def main(options, parser):
         suffix = ''
         if options.simulate:
             suffix += '.d'
-        if options.filter:
+        if options.bandpass or options.lowpass or options.highpass:
             suffix += '.f'
         streams.write(options.outputDirectory, encoding='FLOAT64', suffix=suffix)
     except Exception,msg:
@@ -94,11 +92,11 @@ if __name__ == '__main__':
     parser.add_argument('-p', '--plot', default=False, action='store_true',
             help='Save a plot (PNG format) of the filtered data.')
     parser.add_argument('-bp', dest='bandpass', nargs=3, metavar=('MIN','MAX','NPOLES'),
-            help='Bandpass filter (after) removing instrument response')
-    parser.add_argument('-lp', dest='lowpass', nargs=3, metavar=('FREQ','DF','NPOLES'),
-            help='Lowpass filter (after) removing instrument response')
-    parser.add_argument('-hp', dest='highpass', nargs=3, metavar=('FREQ','DF','NPOLES'),
-            help='Highpass filter (after) removing instrument response')
+            help='Bandpass filter (after) removing instrument response',type=float)
+    parser.add_argument('-lp', dest='lowpass', nargs=2, metavar=('FREQ','NPOLES'),
+            help='Lowpass filter (after) removing instrument response',type=float)
+    parser.add_argument('-hp', dest='highpass', nargs=2, metavar=('FREQ','NPOLES'),
+            help='Highpass filter (after) removing instrument response',type=float)
     parser.add_argument('--outputDirectory', default='.',
             help='Output directory for processed Mini-SEED files')
     parser.add_argument('--simulate', default=False, action='store_true',
