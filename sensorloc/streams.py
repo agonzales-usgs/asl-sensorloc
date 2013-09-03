@@ -152,13 +152,16 @@ class Streams (object):
         @param suffix {String} suffix to append to normal filename.
         """
         extent = self.getTimeExtent(True)
+        encoding = encoding
         # suffix depends on operations performed
         for trace in self.data:
+            if hasattr(trace.stats,'encoding'):
+                encoding = trace.stats.encoding
             trace.write(
                 filename=os.path.join(outputdir,
                         self.getTraceFilename(trace, 'mseed') + suffix),
                 format=format,
-                encoding=encoding or trace.stats.encoding,
+                encoding=encoding,
                 reclen=reclen)
 
     def getTraceFilename(self, trace, format):
