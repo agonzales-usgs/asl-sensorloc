@@ -42,7 +42,7 @@ class Streams (object):
         """
         Construct a new sensorloc.Streams object.
         """
-        self.data = core.stream.Stream();
+        self.data = core.stream.Stream()
 
     def addStream(self, stream):
         """
@@ -130,7 +130,7 @@ class Streams (object):
                     (endtime, extent['end']))
         if len(errors) > 0:
             # validation errors
-            raise StreamsException("\n".join(errors));
+            raise StreamsException("\n".join(errors))
         self.data.trim(starttime, endtime)
 
     def plot(self,filename=None):
@@ -152,16 +152,17 @@ class Streams (object):
         @param suffix {String} suffix to append to normal filename.
         """
         extent = self.getTimeExtent(True)
-        encoding = encoding
         # suffix depends on operations performed
         for trace in self.data:
             if hasattr(trace.stats,'encoding'):
-                encoding = trace.stats.encoding
+                traceEncoding = trace.stats.encoding
+            else:
+                traceEncoding = encoding
             trace.write(
                 filename=os.path.join(outputdir,
                         self.getTraceFilename(trace, 'mseed') + suffix),
                 format=format,
-                encoding=encoding,
+                encoding=traceEncoding,
                 reclen=reclen)
 
     def getTraceFilename(self, trace, format):
@@ -261,7 +262,7 @@ class Streams (object):
             noverlap = NFFT / 4
         # internal function to determine the coherence of unrotated and rotated data
         def cohere1(theta):
-            theta_r = math.radians(theta);
+            theta_r = math.radians(theta)
             rotated = (self.data[0].data)*math.cos(theta_r) + (self.data[1].data)*math.sin(theta_r)
             coh,fre = mlab.cohere(referenceStream.data[0].data, rotated,
                     NFFT=NFFT, noverlap=noverlap, Fs=Fs)
