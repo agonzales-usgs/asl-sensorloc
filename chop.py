@@ -96,7 +96,7 @@ if __name__ == '__main__':
                            help="Select left edge of time series window (YYYY-MM-DDTHH:MM:SS.sss)'", metavar="ENDTIME")
     cmdparser.add_argument("-p", "--plot",
                            action="store_true", dest="makePlot", default=False,
-                           help="Save a plot (JPG format) of the chopped data.")
+                           help="Save plot(s) (JPG format) of the chopped data.")
     cmdparser.add_argument("-r", "--range",
                            action="store_true", dest="getRange", default=False,
                            help="Get the time range of all traces in Mini-SEED file.")
