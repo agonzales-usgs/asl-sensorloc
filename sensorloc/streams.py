@@ -154,8 +154,8 @@ class Streams (object):
         extent = self.getTimeExtent(True)
         # suffix depends on operations performed
         for trace in self.data:
-            if hasattr(trace.stats,'encoding'):
-                traceEncoding = trace.stats.encoding
+            if hasattr(trace.stats.mseed,'encoding'):
+                traceEncoding = trace.stats.mseed.encoding
             else:
                 traceEncoding = encoding
             trace.write(
