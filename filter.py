@@ -72,9 +72,11 @@ def main(options, parser):
             suffix += '.d'
         if options.bandpass or options.lowpass or options.highpass:
             suffix += '.f'
-        streams.write(options.outputDirectory, encoding='FLOAT64', suffix=suffix)
+       	
+	streams.write(options.outputDirectory, encoding='FLOAT64', suffix=suffix)
+   	 
     except Exception,msg:
-        print 'Error writing output: "%s"' % msg
+        print 'Error writing output filter.py: "%s"' % msg
     # generate plot - test
     if options.plot:
         streams.plot()

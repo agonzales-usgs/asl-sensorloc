@@ -160,7 +160,7 @@ class Streams (object):
                 filename=os.path.join(outputdir,
                         self.getTraceFilename(trace, 'mseed') + suffix),
                 format=format,
-                encoding=traceEncoding,
+                encoding=encoding,
                 reclen=reclen)
 
     def getTraceFilename(self, trace, format):
