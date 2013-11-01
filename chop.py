@@ -93,7 +93,7 @@ if __name__ == '__main__':
     cmdparser.add_argument("-s", "--start", dest="startTime", type=utcdatetime.UTCDateTime, default=None,
                            help="Select left edge of time series window (YYYY-MM-DDTHH:MM:SS.sss)'", metavar="STARTTIME")
     cmdparser.add_argument("-e", "--end", dest="endTime", type=utcdatetime.UTCDateTime, default=None,
-                           help="Select left edge of time series window (YYYY-MM-DDTHH:MM:SS.sss)'", metavar="ENDTIME")
+                           help="Select right edge of time series window (YYYY-MM-DDTHH:MM:SS.sss)'", metavar="ENDTIME")
     cmdparser.add_argument("-p", "--plot",
                            action="store_true", dest="makePlot", default=False,
                            help="Save plot(s) (JPG format) of the chopped data.")
