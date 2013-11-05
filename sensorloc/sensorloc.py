@@ -99,8 +99,9 @@ class SensorLoc(object):
 
         @param filename: Desired output Mini-SEED file name.
         """
-        encoding = self.ENCODING[self.DataStream[0].stats['mseed']['encoding']]
-        try:
+        #encoding = self.ENCODING[self.DataStream[0].stats['mseed']['encoding']]
+       	encoding = 'FLOAT64' 
+	try:
             self.DataStream.write(filename,format='MSEED',encoding=encoding)
         except Exception,msg:
             raise SensorLocException('Could not save data to file %s due to error "%s"' % (filename,msg))
