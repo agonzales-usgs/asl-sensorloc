@@ -23,7 +23,7 @@ def main(arguments,parser):
         parser.print_help()
         sys.exit(1)
 
-    #foo
+    # parse input Mini-SEED files (posargs) 
     sl = None
     try:
         sl = streams.Streams()
