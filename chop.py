@@ -35,10 +35,12 @@ def main(arguments,parser):
         sys.exit(1)
     cliprange = sl.getTimeExtent()
 
+    # get time range (start/end)
     if arguments.getRange:
         print 'Start: %s\nFinish: %s\n' % (cliprange['start'],cliprange['end'])
         sys.exit(0)
-    
+   
+    # trim data by start/end times
     try:
         if arguments.outFolder is None:
             outfolder = os.getcwd()
@@ -65,9 +67,6 @@ def main(arguments,parser):
         parser.print_help()
         sys.exit(1)
 
-    
-    
-
 #sort of awkward, but using the syntax below makes it explicit that the "if" code block is the entry
 #point to the program.  The reason for then passing the arguments to a main() function
 #is that variables declared in the block below are **GLOBAL**, and can hence cause confusion 
@@ -82,24 +81,32 @@ if __name__ == '__main__':
      - specify the output directory where chopped traces and plots are written.
      - get the range of the input data file
      - chop the input data interactively (NOT YET IMPLEMENTED)
-     
+    
     """
+    
     cmdparser = argparse.ArgumentParser(usage=usage)
+    
     cmdparser.add_argument('miniseed', metavar='SEED', nargs='+',
                            help='Mini-SEED file to process')
+    
     cmdparser.add_argument("-o", "--outputDirectory", dest="outFolder",nargs='?',
                            help="""Select output directory where chopped time series files will be written 
     (defaults to current working directory)""", metavar="OUTPUTFOLDER")
+    
     cmdparser.add_argument("-s", "--start", dest="startTime", type=utcdatetime.UTCDateTime, default=None,
                            help="Select left edge of time series window (YYYY-MM-DDTHH:MM:SS.sss)'", metavar="STARTTIME")
+    
     cmdparser.add_argument("-e", "--end", dest="endTime", type=utcdatetime.UTCDateTime, default=None,
                            help="Select right edge of time series window (YYYY-MM-DDTHH:MM:SS.sss)'", metavar="ENDTIME")
+    
     cmdparser.add_argument("-p", "--plot",
                            action="store_true", dest="makePlot", default=False,
                            help="Save plot(s) (JPG format) of the chopped data.")
+    
     cmdparser.add_argument("-r", "--range",
                            action="store_true", dest="getRange", default=False,
                            help="Get the time range of all traces in Mini-SEED file.")
+    
     cmdparser.add_argument("-i", "--interactive",
                            action="store_true", dest="interactiveMode", default=False,
                            help="Select time windows interactively")

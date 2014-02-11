@@ -1,0 +1,152 @@
+#!/usr/bin/env python
+
+# -------------------------------------------------------------------
+# Authors: Alejandro Gonzales, Jeremy Fee, Mike Hearne
+# Filename: chop.py
+# -------------------------------------------------------------------
+# Purpose: Chop a Mini-SEED file by two bounding times, and
+# save each trace in a separate file. If start/end times 
+# are NOT set, the output files will be chopped to the 
+# common extent of all of the obspy streams input
+# -------------------------------------------------------------------
+# Methods/Functions:
+#	* Chop() - main parent class (handles all bckgrnd processing)
+#		-> toBool() - converts input strings to booleans
+#	* ChopArgs() - subclass to Chop() (handles input args)
+#	* Help() - help option for user
+# -------------------------------------------------------------------
+
+import argparse
+import sys
+import time
+import os.path
+import os, re, string
+
+# import the object that does all of the work
+from sensorloc import streams
+
+# third party imports
+from obspy.core import utcdatetime
+
+# Parent class will receive vars from inherited
+# subclass ChopArgs() using super()
+class Chop(object):
+	# intialize input vars	
+	def __init__(self, miniseed, **kwargs):
+		print 'Chop() parent class'	
+		print '--------------------'	
+
+		# intialize mseed files
+		print "printing miniseed files...\n"
+		self.miniseed = miniseed	
+		for i in range(len(miniseed)):
+			print "mseed = " + miniseed[i]
+		print 
+		
+		# loop through **kwargs and assign optional args	
+		self.outFolder = ""	# init output directory
+		self.startTime = ""	# init start obspy UTC (YYYY-MM-DDTHH:MM:SS.sss)	
+		self.endTime = ""	# init end obspy UTC (YYYY-MM-DDTHH:MM:SS.sss)	
+		self.makePlot = False	# init make plot (jpg format)
+		self.getRange = False	# init get time range of all traces in mseed 
+		self.interactiveMode = False	# init select time windows interactively	
+		print "printing **kwargs...\n"	
+		for key, value in kwargs.iteritems():
+			if key == "output": self.outFolder = value
+			elif key == "start": self.startTime = value
+			elif key == "end": self.endTime = value
+			elif key == "plot": self.makePlot = self.toBool(value)
+			elif key == "timerange": self.getRange = self.toBool(value)
+			elif key == "interactive": self.interactiveMode = self.toBool(value)
+		print "outputFolder = " + self.outFolder
+		print "startTime = " + self.startTime
+		print "endTime = " + self.endTime
+		print "makePlot = " + str(self.makePlot)
+		print "getRange = " + str(self.getRange)
+		print "interactiveMode = " + str(self.interactiveMode)
+
+		# interactive mode not implemented (exit program)	
+		if self.interactiveMode:
+			print '\nInteractive mode is not yet implemented.'
+			print 'Program exiting...\n'
+			sys.exit(1)
+		
+		# if miniseed list does not contain file exit
+		if len(self.miniseed) != 0:
+			self.addSeedFile
+	
+	# convert optional boolean strings to boolean vars
+	def toBool(self, value):
+		"""
+		Converts 'string' to boolean. Raises exception for invalid formats
+			True values: 1, True, true, "1", "True", "true", "yes", "y", "t"
+			False values: 0, False, false, "0", "False", "false", "no", "n", "f" 
+		"""
+		if str(value).lower() in ("true", "yes", "t", "y", "1"): return True
+		if str(value).lower() in ("false", "no", "f", "n", "0"): return False
+		raise Exception('Invalid value for boolean conversion: ' + str(value))
+
+# Subclass uses super() to pass individual params 
+# to parent class Chop()
+class ChopArgs(Chop):	
+	def __init__(self, *args, **kwargs):	
+		print 'ChopArgs() subclass'	
+		print '--------------------'	
+		
+		# check for empty args (no mseed files) 
+		if not args:
+			print '\nYou must pass in the name of an input Mini-SEED file.'
+			print 'Program exiting...\n'
+			sys.exit(1)
+		
+		# initialize positional arguments (*args defines mseed files)	
+		miniseed = []	# initialize mseed file list	
+		for f in args:
+			miniseed.append(f)	
+	
+		# pass variables to parent class Chop()
+		super(ChopArgs, self).__init__(miniseed, **kwargs)	
+
+def Help():
+	"""
+	UTCTime:
+		- utc:					YYYY-MM-DD HH:MM:SS.sss
+		- utc.strftime(%Y%m%d_%H:00:00): 	YYYYMMDD_HH:MM:SS
+		- UTCDateTime(utc.strftime()):		YYYY-MM-DDTHH:MM:SS.sssZ 
+	"""
+	
+	usage = """Usage: Chop a Mini-SEED file by two bounding times, and
+	save each trace in a separate file. If start/end times
+	are NOT set, the output files will be chopped to the 
+	common extent of all of the obspy streams input.
+	Optionally the user can:
+		- plot the chopped traces
+		- specify the output directory where chopped traces/plots are written
+		- get the range of the input data file
+		- chop the input data interactively (NOT YET IMPLEMENTED)
+	Arguments will be passed to:
+		- chop.ChopArgs(posargs, optargs)
+		- posargs - positional arguments (miniseed file(s))
+		- optargs - optional arguments (output, start, end, plot, timerange, interactive)
+	"""
+
+	posargs = """postional arguments:
+	('x.seed', 'y.seed',...)\tMini-SEED file(s) to process 	
+	"""
+
+	optargs = """optional arguments:
+	(output='/path/to/dir/')	 \tSelect output directory where chopped time 
+					 \tseries files will be written 
+					 \t(default: cwd)
+	(start='YYYY-MM-DDTHH:MM:SS.sss')\tSelect left edge of time series window
+					 \t(UTCDateTime)
+	(end='YYYY-MM-DDTHH:MM:SS.sss')  \tSelect right edge of time series window
+				         \t(UTCDateTime) 
+	(plot='True/False')		 \tSave plot(s) (JPG format) of chopped data
+	(timerange='True/False')	 \tGet time range of all traces in MSEED file
+	(interactive='True/False')	 \tSelect time windows interactively (NOT IMPLEMENTED)
+	"""
+
+	print usage 
+	print posargs
+	print optargs

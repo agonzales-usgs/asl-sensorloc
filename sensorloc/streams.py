@@ -250,7 +250,22 @@ class Streams (object):
         @return relative angle from unknown north to reference north
                 (referenceAngle-angle = actual angle of unknown channel).
         """
-        referenceExtent = referenceStream.getTimeExtent()
+        # internal function to determine the coherence of unrotated and rotated data
+        def cohere1(theta):
+            print "\ncohere1()..." 
+	    theta_r = math.radians(theta)
+            rotated = (self.data[0].data)*math.cos(theta_r) + (self.data[1].data)*math.sin(theta_r)
+            coh,fre = mlab.cohere(referenceStream.data[0].data, rotated,
+                    NFFT=NFFT, noverlap=noverlap, Fs=Fs)
+            print "theta_r = " + str(theta_r)
+	    print "rotated data len = " + str(len(rotated))
+	    print "coherence freq len = " + str(len(fre))
+	    print "coherence data len = " + str(len(coh))
+	    cohsum = (coh - 1).sum()
+	    print "coherence sum = (coh - 1).sum() = " + str(cohsum) 
+	    return cohsum
+	
+	referenceExtent = referenceStream.getTimeExtent()
         unknownExtent = self.getTimeExtent()
         if referenceExtent['start'] != unknownExtent['start'] or referenceExtent['end'] != unknownExtent['end']:
             raise StreamsException("reference and unknown streams must have same time extent")
@@ -258,16 +273,10 @@ class Streams (object):
             Fs = referenceStream.data.traces[0].stats.sampling_rate
         if noverlap is None:
             noverlap = NFFT / 4
-        # internal function to determine the coherence of unrotated and rotated data
-        def cohere1(theta):
-            theta_r = math.radians(theta)
-            rotated = (self.data[0].data)*math.cos(theta_r) + (self.data[1].data)*math.sin(theta_r)
-            coh,fre = mlab.cohere(referenceStream.data[0].data, rotated,
-                    NFFT=NFFT, noverlap=noverlap, Fs=Fs)
-            return (coh - 1).sum()
         # most coherent angle of rotation
         theta1 = solv.leastsq(cohere1, 0)
         theta1 = normalize360(theta1[0][0])
+	print "theta1 = normalize360(theta1[0][0]) = " + str(theta1)
 
         # rotate data and compare against reference stream
         rotated = self.rotate(theta1)
@@ -275,7 +284,8 @@ class Streams (object):
         referenceData1 = referenceStream.data[0].data.astype('Float64')
         scale1 = sum(abs(rotatedData1)) / sum(abs(referenceData1))
         residual1 = sum(referenceData1**2-rotatedData1*scale1)**2
-        rotatedData2 = rotated.data[1].data.astype('Float64')
+        
+	rotatedData2 = rotated.data[1].data.astype('Float64')
         referenceData2 = referenceStream.data[1].data.astype('Float64')
         scale2 = sum(abs(rotatedData2)) / sum(abs(referenceData2))
         residual2 = sum(referenceData2**2-rotatedData2*scale2)**2
