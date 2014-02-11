@@ -15,6 +15,8 @@ kwargs:
 """
 
 #chop.Help()
+# Changing seed directory to telemetry_days from 
+# asldcc01/tr1/ mount point
 homedir = os.getcwd()
 telemdir = '/home/agonzales/Documents/telemetry_days'
 print "homedir = " + str(homedir)
