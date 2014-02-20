@@ -258,9 +258,6 @@ class Streams (object):
             coh,fre = mlab.cohere(referenceStream.data[0].data, rotated,
                     NFFT=NFFT, noverlap=noverlap, Fs=Fs)
             print "theta_r = " + str(theta_r)
-	    print "rotated data len = " + str(len(rotated))
-	    print "coherence freq len = " + str(len(fre))
-	    print "coherence data len = " + str(len(coh))
 	    cohsum = (coh - 1).sum()
 	    print "coherence sum = (coh - 1).sum() = " + str(cohsum) 
 	    return cohsum
@@ -277,6 +274,7 @@ class Streams (object):
         theta1 = solv.leastsq(cohere1, 0)
         theta1 = normalize360(theta1[0][0])
 	print "theta1 = normalize360(theta1[0][0]) = " + str(theta1)
+	print 
 
         # rotate data and compare against reference stream
         rotated = self.rotate(theta1)

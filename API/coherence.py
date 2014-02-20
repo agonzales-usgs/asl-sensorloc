@@ -8,6 +8,8 @@
 # an unknown station
 # ---------------------------------------------------------------------
 # Methods/Functions:
+#	* python setup.py() in /asl-sensorloc/ will build all 
+#	  sensorloc dependencies to be used for any program
 #	* Coherence() - main parent class (handles bckgrnd processing)
 #	* CoherenceArgs() - subclass to Coherence() (handles input args)
 #	* Help() - help option for user
