@@ -20,15 +20,15 @@ kwargs:
 homedir = os.getcwd()
 telemdir = '/home/agonzales/Documents/telemetry_days'
 station = 'IU_ANMO/2014'
-day = '2014_062'
+day = '2014_110'
 sdfile = '10_LHZ.512.seed'
 stationdir = os.path.join(telemdir, station)
 seeddir = os.path.join(stationdir, day)
 seedfile = os.path.join(seeddir, sdfile)
 outputdir = os.path.join(homedir, 'chopOutput')
 obj1 = chop.ChopArgs(seedfile, output=outputdir,\
-			start="2014-03-03T07:00:00.0Z",\
-			end="2014-03-03T17:30:00.0Z",\
+			start="2014-04-20T07:00:00.0Z",\
+			end="2014-04-20T17:30:00.0Z",\
 			plot="true", timerange="false", interactive="false")
 '''
 # Passing no mseed files should result in error

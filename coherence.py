@@ -109,4 +109,4 @@ if __name__ == '__main__':
     parser.add_argument('-p', '--plot', default=False, action='store_true',
             help='Save a plot (PNG format) of the chopped data.')
     
-    main(parser.parse_args(),parser)
+    main(parser.parse_args(), parser)
